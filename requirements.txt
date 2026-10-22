@@ -1,0 +1,17 @@
+
+# LLM and agent orchestration
+langgraph
+langchain-groq
+langchain-core
+
+# Backend API
+fastapi
+uvicorn[standard]
+
+# Data validation and configuration
+pydantic
+python-dotenv
+
+# Testing
+pytest
+httpx
