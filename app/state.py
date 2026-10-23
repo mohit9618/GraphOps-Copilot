@@ -18,12 +18,16 @@ class State(TypedDict):
     root_cause_confidence: float
     evidence: list[str]
 
+    remediation_action_id: str
+    execution_status: str
     suggested_remediation: str
     remediation_risk: str
     approval_status: str
     remediation_result: str
+    approval_decision: dict | None
 
     verification_status: str
     verification_details: str
+    verification_observations: list[str]
 
     errors: list[str]
