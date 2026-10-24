@@ -1,22 +1,25 @@
 
+from langgraph.types import interrupt
+
 from app.schemas.incident import ApprovalDecision
 from app.state import State
 
 
 def approval_node(state: State) -> dict:
-    decision_data = state.get("approval_decision")
+    approval_request = {
+        "incident_id": state.get("incident_id", "unknown"),
+        "incident_description": state.get("incident_description", ""),
+        "affected_service": state.get("affected_service", "unknown"),
+        "severity": state.get("severity", "unknown"),
+        "root_cause": state.get("root_cause", ""),
+        "suggested_remediation": state.get("suggested_remediation", ""),
+        "remediation_risk": state.get("remediation_risk", "unknown"),
+    }
 
-    if not decision_data:
-        return {
-            "approval_status": "pending",
-            "errors": state.get("errors", []),
-        }
+    # The graph pauses here until an external caller resumes it.
+    decision_data = interrupt(approval_request)
 
-    if isinstance(decision_data, ApprovalDecision):
-        decision = decision_data
-    else:
-        decision = ApprovalDecision.model_validate(decision_data)
-
+    decision = ApprovalDecision.model_validate(decision_data)
     errors = list(state.get("errors", []))
 
     if not decision.approved:
@@ -28,11 +31,10 @@ def approval_node(state: State) -> dict:
         }
 
     if not decision.approved_by.strip():
-        errors.append("Approval rejected: approver identity is required.")
         return {
             "approval_status": "pending",
             "approved_action_id": "",
-            "errors": errors,
+            "errors": errors + ["Approver identity is required."],
         }
 
     return {

@@ -54,6 +54,6 @@ def log_analyst_node(state: State) -> dict:
     result = structured_llm.invoke(prompt)
 
     return {
-        "log_analysis": result.conclusion,
-        "evidence": result.relevant_logs,
+    "log_analysis": result.conclusion,
+    "log_evidence": result.relevant_logs,
     }
